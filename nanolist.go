@@ -702,7 +702,7 @@ func checkConfig() bool {
          ServerName: gConfig.SMTPHostname,
          }
 
-	conn, err := tls.Dial("tcp", fConfig.SMTPHostname + ":" + gConfig.SMTPPort, tlsconfig)
+	conn, err := tls.Dial("tcp", gConfig.SMTPHostname + ":" + gConfig.SMTPPort, tlsconfig)
 	if err != nil {
 		fmt.Printf("There's a problem connecting to your SMTP server: %s\n", err.Error())
 		return false
