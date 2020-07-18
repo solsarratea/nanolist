@@ -12,7 +12,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/mail"
-	"net/smtp"
+        "crypto/tls"
+        "net/smtp"
 	"os"
 	"strings"
 	"time"
@@ -696,11 +697,23 @@ func checkConfig() bool {
 		return false
 	}
 
-	client, err := smtp.Dial(gConfig.SMTPHostname + ":" + gConfig.SMTPPort)
+        tlsconfig := &tls.Config {
+         InsecureSkipVerify: true,
+         ServerName: gConfig.SMTPHostname,
+         }
+
+	conn, err := tls.Dial("tcp", fConfig.SMTPHostname + ":" + gConfig.SMTPPort, tlsconfig)
 	if err != nil {
 		fmt.Printf("There's a problem connecting to your SMTP server: %s\n", err.Error())
 		return false
 	}
+
+        client, err := smtp.NewClient(conn, gConfig.SMTPHostname)
+        if err != nil {
+               fmt.Printf("Problem: %s", err.Error())
+               return false
+        }
+
 
 	auth := smtp.PlainAuth("", gConfig.SMTPUsername, gConfig.SMTPPassword, gConfig.SMTPHostname)
 	err = client.Auth(auth)
